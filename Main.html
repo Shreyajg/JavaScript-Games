@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>CapybaraCapybara.com</title>
+    </head>
+    <style>
+        .container {
+            position: relative;
+            width: 100%;
+            height: 700px;
+            overflow: hidden;
+        }
+
+        .sky {
+            background: url(cloudd.jpg) repeat-x;
+            background-size: 1300px;
+            background-color: skyblue;
+            height: 700px;
+            width: 100%;
+            animation: slideright 60s infinite linear;
+        }
+
+        .ground {
+            background-size: 300px;
+            background-color: yellowgreen;
+            height: 100px;
+            width: 100%;
+            position: absolute;
+            bottom: 0px;
+            animation: slideright 60s infinite linear;
+        }
+
+        .Capybara {
+            position: absolute;
+            left: 50px;
+            bottom: 0px;
+            width: 100px;
+            height: 100px;
+        }
+
+        .boulders {
+            position: absolute;
+            bottom: 20px;
+            width: 30px;
+            height: 80px;
+            background: url(fin.jpg);
+            background-size: cover;
+        }
+
+        #alert {
+            position: absolute;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 30px;
+            font-weight: bold;
+            color: red;
+            display: none;
+        }
+
+        #score {
+            position: absolute;
+            top: 20px;
+            right: 50px;
+            font-size: 25px;
+            font-weight: bold;
+            color: black;
+            background-color: white;
+            padding: 10px;
+            border-radius: 10px;
+        }
+
+        @keyframes slideright {
+            from {
+                background-position: 1000%;
+            }
+            to {
+                background-position: 0%;
+            }
+        }
+    </style>
+    <body>
+        <div class="container">
+            <div class="sky"></div>
+            <div class="ground"></div>
+            <div id="alert">Game Over!</div>
+            <div id="score">Score: 0</div>
+            <img class="Capybara" src="capybaracapybara.png">
+        </div>
+    </body>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const capy = document.querySelector('.Capybara');
+            const container = document.querySelector('.container');
+            const alertBox = document.getElementById('alert');
+            const scoreDisplay = document.getElementById('score');
+
+            let isJumping = false;
+            let gravity = 5;
+            let jumpHeight = 150;
+            let jumpSpeed = 20;
+            let gameOver = false;
+            let score = 0;
+
+            function control(e) {
+                if (e.code === 'Space' && !isJumping) {
+                    jump();
+                }
+            }
+
+            document.addEventListener('keydown', control);
+
+            function jump() {
+                if (gameOver) return;
+
+                isJumping = true;
+                let position = 0;
+
+                let upTimerId = setInterval(() => {
+                    if (position >= jumpHeight) {
+                        clearInterval(upTimerId);
+                        fall();
+                    } else {
+                        position += jumpSpeed;
+                        capy.style.bottom = position + 'px';
+                    }
+                }, 20);
+
+                function fall() {
+                    let downTimerId = setInterval(() => {
+                        if (position <= 0) {
+                            clearInterval(downTimerId);
+                            isJumping = false;
+                            capy.style.bottom = '0px';
+                        } else {
+                            position -= gravity;
+                            capy.style.bottom = position + 'px';
+                        }
+                    }, 20);
+                }
+            }
+
+            function generateObstacles() {
+                if (gameOver) return;
+
+                let obstpos = 1000;
+                const obst = document.createElement('div');
+                obst.classList.add('boulders');
+                obst.style.left = obstpos + 'px';
+                container.appendChild(obst);
+
+                let obstTimerId = setInterval(() => {
+                    if (gameOver) {
+                        clearInterval(obstTimerId);
+                        return;
+                    }
+
+                    obstpos -= 10;
+                    obst.style.left = obstpos + 'px';
+
+                    let capyRect = capy.getBoundingClientRect();
+                    let obstRect = obst.getBoundingClientRect();
+
+                    if (
+                        capyRect.left < obstRect.right &&
+                        capyRect.right > obstRect.left &&
+                        capyRect.bottom > obstRect.top
+                    ) {
+                        clearInterval(obstTimerId);
+                        alertBox.style.display = 'block';
+                        gameOver = true;
+                    }
+
+                    if (obstpos < -50) {
+                        clearInterval(obstTimerId);
+                        container.removeChild(obst);
+                        if (!gameOver) {
+                            score++;
+                            scoreDisplay.innerText = `Score: ${score}`;
+                        }
+                    }
+                }, 20);
+            }
+
+            setInterval(() => {
+                if (!gameOver) generateObstacles();
+            }, Math.random() * 3000 + 1000); // Randomly generate every 1-4 seconds
+        });
+    </script>
+</html>
