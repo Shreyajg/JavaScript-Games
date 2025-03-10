@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>
+            BMIcalc.com
+        </title>
+    </head>
+    <style>
+        body{
+            background-color: black;
+        
+        }
+        .enter{
+            color: white;
+            display: inline-block;
+        }
+        .alert{
+            color:white;
+            text-align: center;
+            font-size: 20px;
+        }
+    </style>
+    <body>
+        <div class="Constainer">
+            <div class="alert">
+
+            </div>
+            <div class="enter">
+                <p>enter your height</p>
+                <input class="Height" type="number">
+                <p>enter your wieght</p>
+                <input class="weight" type="number">
+                <button class="calcbutton">calculate</button>
+            </div>
+        </div>
+    </body>
+    <script>
+        document.addEventListener('DOMContentLoaded',()=>{
+            const calc=document.querySelector('.calcbutton')
+            const alert=document.querySelector('.alert')
+            calc.addEventListener('click',calculate)
+            function calculate()
+            {
+                let bod=document.querySelector('body')
+                let h=document.querySelector('.Height').value
+                let w=document.querySelector('.weight').value
+                let hie=parseFloat(h)
+                let wie=parseFloat(w)
+                let bmi=wie/(hie*hie)
+                if(bmi<18.5)
+                {
+                    bod.style.backgroundColor='red'
+                    alert.innerHTML='Under weight'
+                }
+                else if(bmi>=18.5&&bmi<=24.9){
+                    bod.style.backgroundColor='green'
+                    alert.innerHTML='Normal Weight'
+                }
+                else if(bmi>=25) {
+                    bod.style.backgroundColor='red'
+                    alert.innerHTML='Over Weight'
+                }
+               
+            }
+
+        });
+    </script>
+</html>
